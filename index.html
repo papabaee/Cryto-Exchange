@@ -211,14 +211,14 @@
     <div class="login-sub">Sign in to access your portfolio across all devices.</div>
     <div class="login-group">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()" />
+      <input type="email" id="login-email" placeholder="your@email.com"  />
     </div>
     <div class="login-group">
       <label>Password</label>
-      <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      <input type="password" id="login-password" placeholder="••••••••"  />
     </div>
     <div class="login-error" id="login-error"></div>
-    <button class="btn-login" id="login-btn" onclick="doLogin()">Sign in</button>
+    <button class="btn-login" id="login-btn" id="login-submit-btn">Sign in</button>
   </div>
 </div>
 
@@ -229,14 +229,14 @@
       <h1>Dashboard</h1>
     </div>
     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+      <button class="btn-logout" id="logout-btn">Sign out</button>
       <div class="sync-indicator"><div class="sync-dot" id="sync-dot"></div><span id="sync-status">connecting...</span></div>
     </div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('calculator')">Calculator</button>
-    <button class="tab" onclick="switchTab('tracker')">Portfolio</button>
+    <button class="tab active" data-tab="calculator">Calculator</button>
+    <button class="tab" data-tab="tracker">Portfolio</button>
   </div>
 
   <!-- CALCULATOR -->
@@ -246,29 +246,29 @@
       <div class="input-row">
         <div class="input-group">
           <label>Select coin</label>
-          <select id="coin-select" onchange="onCoinChange()"></select>
+          <select id="coin-select"></select>
         </div>
         <div class="input-group" id="custom-coin-group" style="display:none;">
           <label>Custom symbol</label>
-          <input type="text" id="custom-coin" placeholder="e.g. MATIC" maxlength="8" oninput="calcFees()" />
+          <input type="text" id="custom-coin" placeholder="e.g. MATIC" maxlength="8"  />
         </div>
       </div>
       <div class="input-row">
         <div class="input-group">
           <label>Market price (RM)</label>
-          <input type="number" id="coin-price" placeholder="e.g. 900" oninput="calcFees()" min="0" step="any" />
+          <input type="number" id="coin-price" placeholder="e.g. 900"  min="0" step="any" />
         </div>
         <div class="input-group">
           <label>Amount to spend (RM)</label>
-          <input type="number" id="rm-amount" placeholder="e.g. 1000" value="1000" oninput="calcFees()" min="0" step="any" />
+          <input type="number" id="rm-amount" placeholder="e.g. 1000" value="1000"  min="0" step="any" />
         </div>
       </div>
       <div class="extra-coin-row">
         <span style="font-size:11px;color:var(--text-muted);font-family:var(--mono);align-self:center;">Quick:</span>
-        <div class="coin-chip" onclick="setAmt(100)">RM 100</div>
-        <div class="coin-chip" onclick="setAmt(500)">RM 500</div>
-        <div class="coin-chip" onclick="setAmt(1000)">RM 1,000</div>
-        <div class="coin-chip" onclick="setAmt(5000)">RM 5,000</div>
+        <div class="coin-chip" data-amt="100">RM 100</div>
+        <div class="coin-chip" data-amt="500">RM 500</div>
+        <div class="coin-chip" data-amt="1000">RM 1,000</div>
+        <div class="coin-chip" data-amt="5000">RM 5,000</div>
       </div>
     </div>
     <div id="calc-output"><div class="placeholder-box">Enter a price and amount above ↑</div></div>
@@ -285,7 +285,7 @@
         </div>
         <div class="input-group">
           <label>Coin</label>
-          <select id="t-coin" onchange="onTCoinChange()"></select>
+          <select id="t-coin" ></select>
         </div>
       </div>
       <div class="input-row">
@@ -305,7 +305,7 @@
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-primary" onclick="addPurchase()">+ Add purchase</button>
+        <button class="btn btn-primary" id="add-purchase-btn">+ Add purchase</button>
       </div>
     </div>
 
@@ -315,7 +315,7 @@
           <div class="ph-title">Current market prices (RM)</div>
           <div class="ph-sub" id="last-updated-txt">Not yet refreshed</div>
         </div>
-        <button class="btn-refresh" id="refresh-btn" onclick="refreshAllPrices()">
+        <button class="btn-refresh" id="refresh-btn" >
           <span id="refresh-icon">↻</span> Refresh prices
         </button>
       </div>
@@ -330,13 +330,13 @@
 <div class="card" id="data-card" style="margin-top:1.5rem;">
   <div class="card-label">// data management</div>
   <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-    <button class="btn btn-export" onclick="exportData()">
+    <button class="btn btn-export" id="export-btn">
       <span>↓</span> Export backup
     </button>
     <label class="btn btn-import" for="import-file">
       <span>↑</span> Import backup
     </label>
-    <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none;" />
+    <input type="file" id="import-file" accept=".json" id="import-file" style="display:none;" />
     <span id="import-status" style="font-size:11px;font-family:var(--mono);color:var(--text-muted);"></span>
   </div>
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
@@ -580,7 +580,7 @@ function buildDropdowns() {
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
   document.getElementById('page-' + tab).classList.add('active');
   if (tab === 'tracker') renderPortfolio();
 }
@@ -899,6 +899,65 @@ function importData(event) {
   };
   reader.readAsText(file);
 }
+
+
+// ─── EVENT LISTENERS (fixes module scope issue) ──────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {});
+
+// Login
+const loginSubmitBtn = document.getElementById('login-submit-btn');
+if (loginSubmitBtn) loginSubmitBtn.addEventListener('click', doLogin);
+
+['login-email','login-password'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+});
+
+// Logout
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+
+// Tabs
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+// Calculator inputs
+const coinPrice = document.getElementById('coin-price');
+const rmAmount = document.getElementById('rm-amount');
+const customCoin = document.getElementById('custom-coin');
+if (coinPrice) coinPrice.addEventListener('input', calcFees);
+if (rmAmount) rmAmount.addEventListener('input', calcFees);
+if (customCoin) customCoin.addEventListener('input', calcFees);
+
+// Coin select
+const coinSelect = document.getElementById('coin-select');
+if (coinSelect) coinSelect.addEventListener('change', onCoinChange);
+
+// Quick amounts
+document.querySelectorAll('[data-amt]').forEach(chip => {
+  chip.addEventListener('click', () => setAmt(parseFloat(chip.dataset.amt)));
+});
+
+// Tracker coin select
+const tCoin = document.getElementById('t-coin');
+if (tCoin) tCoin.addEventListener('change', onTCoinChange);
+
+// Add purchase
+const addBtn = document.getElementById('add-purchase-btn');
+if (addBtn) addBtn.addEventListener('click', addPurchase);
+
+// Refresh prices
+const refreshBtn = document.getElementById('refresh-btn');
+if (refreshBtn) refreshBtn.addEventListener('click', refreshAllPrices);
+
+// Export
+const exportBtn = document.getElementById('export-btn');
+if (exportBtn) exportBtn.addEventListener('click', exportData);
+
+// Import
+const importFile = document.getElementById('import-file');
+if (importFile) importFile.addEventListener('change', importData);
 
 // INIT — driven by onAuthStateChanged above
 window.buildDropdowns = buildDropdowns;
