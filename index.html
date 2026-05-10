@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luno Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
+  }
+}
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -155,6 +164,32 @@
   .btn-export:hover { background: #00e5a015; }
   .btn-import { background: var(--surface2); color: var(--text-muted); border-color: var(--border); font-family: var(--mono); font-size: 12px; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid; display: flex; align-items: center; gap: 6px; }
   .btn-import:hover { border-color: var(--accent); color: var(--accent); background: #00e5a015; }
+
+  /* LOGIN */
+  #login-screen { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:1000; padding:1rem;
+    background-image: radial-gradient(ellipse at 20% 20%, #00e5a010 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, #ff4d6d08 0%, transparent 50%); }
+  .login-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:380px; }
+  .login-tag { font-family:var(--mono); font-size:11px; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:8px; }
+  .login-title { font-size:26px; font-weight:700; margin-bottom:4px; }
+  .login-sub { font-size:13px; color:var(--text-muted); margin-bottom:2rem; line-height:1.5; }
+  .login-group { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .login-group label { font-size:12px; color:var(--text-muted); font-family:var(--mono); }
+  .login-group input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:var(--mono); font-size:14px; padding:11px 14px; outline:none; transition:border-color 0.2s; }
+  .login-group input:focus { border-color:var(--accent); }
+  .btn-login { width:100%; padding:13px; background:var(--accent); color:#000; border:none; border-radius:10px; font-family:var(--mono); font-size:14px; font-weight:500; cursor:pointer; margin-top:6px; transition:opacity 0.15s; }
+  .btn-login:hover { opacity:0.85; }
+  .btn-login:disabled { opacity:0.5; cursor:not-allowed; }
+  .login-error { font-size:12px; color:var(--red); font-family:var(--mono); margin-top:8px; min-height:16px; }
+  /* TOP BAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
+  .topbar-user { font-size:11px; color:var(--text-muted); font-family:var(--mono); }
+  .btn-logout { background:none; border:1px solid var(--border); border-radius:8px; color:var(--text-muted); font-family:var(--mono); font-size:11px; padding:5px 12px; cursor:pointer; transition:all 0.15s; }
+  .btn-logout:hover { border-color:var(--red); color:var(--red); }
+  .sync-indicator { font-size:10px; font-family:var(--mono); color:var(--text-dim); display:flex; align-items:center; gap:5px; }
+  .sync-dot { width:6px; height:6px; border-radius:50%; background:var(--text-dim); }
+  .sync-dot.synced { background:var(--accent); }
+  .sync-dot.syncing { background:#ffd93d; animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   footer { text-align: center; margin-top: 2rem; font-size: 11px; color: var(--text-dim); font-family: var(--mono); padding-bottom: 2rem; }
 
   @media (max-width: 520px) {
@@ -168,11 +203,35 @@
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div class="tag">// Luno Malaysia</div>
-    <h1>Dashboard</h1>
-    <p>Fee calculator + portfolio tracker · 51 coins supported</p>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-tag">// Luno Malaysia</div>
+    <div class="login-title">Dashboard</div>
+    <div class="login-sub">Sign in to access your portfolio across all devices.</div>
+    <div class="login-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="login-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="btn-login" id="login-btn" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<div class="container" id="main-app" style="display:none;">
+  <div class="topbar">
+    <div class="header" style="margin-bottom:0;">
+      <div class="tag">// Luno Malaysia</div>
+      <h1>Dashboard</h1>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+      <div class="sync-indicator"><div class="sync-dot" id="sync-dot"></div><span id="sync-status">connecting...</span></div>
+    </div>
   </div>
 
   <div class="tabs">
@@ -284,8 +343,170 @@
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
 
-<script>
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD9ghnQE6L3QvKJYzbjnFJmF2pPnb5xaTc",
+  authDomain: "luno-dashboard.firebaseapp.com",
+  projectId: "luno-dashboard",
+  storageBucket: "luno-dashboard.firebasestorage.app",
+  messagingSenderId: "736449374620",
+  appId: "1:736449374620:web:e90258bd9bafecbc890059",
+  measurementId: "G-R4Z2W5JVM7"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let unsubscribe = null;
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+window.doLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  err.textContent = '';
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    err.textContent = '✗ ' + (e.code === 'auth/invalid-credential' ? 'Invalid email or password' : e.message);
+    btn.textContent = 'Sign in'; btn.disabled = false;
+  }
+};
+
+window.doLogout = async function() {
+  if (unsubscribe) unsubscribe();
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    syncStatus('syncing');
+    startSync();
+  } else {
+    currentUser = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('login-btn').textContent = 'Sign in';
+    document.getElementById('login-btn').disabled = false;
+  }
+});
+
+// ─── FIRESTORE SYNC ──────────────────────────────────────────────────────────
+function syncStatus(state) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-status');
+  if (state === 'synced') { dot.className='sync-dot synced'; txt.textContent='synced'; }
+  else if (state === 'syncing') { dot.className='sync-dot syncing'; txt.textContent='syncing...'; }
+  else { dot.className='sync-dot'; txt.textContent='offline'; }
+}
+
+function startSync() {
+  if (!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid);
+  unsubscribe = onSnapshot(ref, snap => {
+    if (snap.exists()) {
+      const data = snap.data();
+      purchases = data.purchases || [];
+      currentPrices = data.currentPrices || {};
+    } else {
+      purchases = [];
+      currentPrices = {};
+    }
+    syncStatus('synced');
+    buildDropdowns();
+    document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
+    renderPortfolio();
+  }, err => {
+    syncStatus('offline');
+  });
+}
+
+async function saveToFirestore() {
+  if (!currentUser) return;
+  syncStatus('syncing');
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid), {
+      purchases,
+      currentPrices,
+      updatedAt: new Date().toISOString()
+    });
+    syncStatus('synced');
+  } catch(e) {
+    syncStatus('offline');
+  }
+}
+
 const COINS = [
+  { symbol:'BTC',     name:'Bitcoin',                   id:'bitcoin' },
+  { symbol:'ETH',     name:'Ethereum',                  id:'ethereum' },
+  { symbol:'XRP',     name:'XRP',                       id:'ripple' },
+  { symbol:'SOL',     name:'Solana',                    id:'solana' },
+  { symbol:'ADA',     name:'Cardano',                   id:'cardano' },
+  { symbol:'LTC',     name:'Litecoin',                  id:'litecoin' },
+  { symbol:'BCH',     name:'Bitcoin Cash',              id:'bitcoin-cash' },
+  { symbol:'DOT',     name:'Polkadot',                  id:'polkadot' },
+  { symbol:'LINK',    name:'Chainlink',                  id:'chainlink' },
+  { symbol:'AVAX',    name:'Avalanche',                  id:'avalanche-2' },
+  { symbol:'ATOM',    name:'Cosmos',                    id:'cosmos' },
+  { symbol:'XLM',     name:'Stellar',                   id:'stellar' },
+  { symbol:'UNI',     name:'Uniswap',                   id:'uniswap' },
+  { symbol:'POL',     name:'Polygon',                   id:'matic-network' },
+  { symbol:'AAVE',    name:'Aave',                      id:'aave' },
+  { symbol:'CRV',     name:'Curve',                     id:'curve-dao-token' },
+  { symbol:'SNX',     name:'Synthetix',                 id:'havven' },
+  { symbol:'ALGO',    name:'Algorand',                  id:'algorand' },
+  { symbol:'NEAR',    name:'NEAR Protocol',             id:'near' },
+  { symbol:'HBAR',    name:'Hedera',                    id:'hedera-hashgraph' },
+  { symbol:'GRT',     name:'The Graph',                 id:'the-graph' },
+  { symbol:'TON',     name:'The Open Network',          id:'the-open-network' },
+  { symbol:'TRX',     name:'Tron',                      id:'tron' },
+  { symbol:'SUI',     name:'Sui',                       id:'sui' },
+  { symbol:'INJ',     name:'Injective',                 id:'injective-protocol' },
+  { symbol:'SEI',     name:'Sei',                       id:'sei-network' },
+  { symbol:'ARB',     name:'Arbitrum',                  id:'arbitrum' },
+  { symbol:'OP',      name:'Optimism',                  id:'optimism' },
+  { symbol:'TIA',     name:'Celestia',                  id:'celestia' },
+  { symbol:'STRK',    name:'Starknet',                  id:'starknet' },
+  { symbol:'IMX',     name:'Immutable X',               id:'immutable-x' },
+  { symbol:'LRC',     name:'Loopring',                  id:'loopring' },
+  { symbol:'S',       name:'Sonic',                     id:'sonic-3' },
+  { symbol:'BERA',    name:'Berachain',                 id:'berachain-bera' },
+  { symbol:'FET',     name:'ASI Alliance',              id:'fetch-ai' },
+  { symbol:'TAO',     name:'Bittensor',                 id:'bittensor' },
+  { symbol:'RENDER',  name:'Render Network',            id:'render-token' },
+  { symbol:'VIRTUAL', name:'Virtuals Protocol',         id:'virtual-protocol' },
+  { symbol:'AXS',     name:'Axie Infinity',             id:'axie-infinity' },
+  { symbol:'SAND',    name:'The Sandbox',               id:'the-sandbox' },
+  { symbol:'APE',     name:'ApeCoin',                   id:'apecoin' },
+  { symbol:'ONDO',    name:'Ondo Finance',              id:'ondo-finance' },
+  { symbol:'PAXG',    name:'PAX Gold',                  id:'pax-gold' },
+  { symbol:'HNT',     name:'Helium',                    id:'helium' },
+  { symbol:'ANKR',    name:'Ankr',                      id:'ankr' },
+  { symbol:'ENS',     name:'Ethereum Name Service',     id:'ethereum-name-service' },
+  { symbol:'ZRO',     name:'LayerZero',                 id:'layerzero' },
+  { symbol:'LDO',     name:'Lido',                      id:'lido-dao' },
+  { symbol:'JUP',     name:'Jupiter',                   id:'jupiter-exchange-solana' },
+  { symbol:'PYTH',    name:'Pyth Network',              id:'pyth-network' },
+  { symbol:'SKY',     name:'Sky',                       id:'sky-governance-token' },
+  { symbol:'OTHER',   name:'Other (custom)',            id:null },
+];
+
+let purchases = [];
+let currentPrices = {};
+let livePrices = {};
+
+function save() { saveToFirestore(); } = [
   { symbol:'BTC',     name:'Bitcoin',                   id:'bitcoin' },
   { symbol:'ETH',     name:'Ethereum',                  id:'ethereum' },
   { symbol:'XRP',     name:'XRP',                       id:'ripple' },
@@ -679,10 +900,19 @@ function importData(event) {
   reader.readAsText(file);
 }
 
-// INIT
-buildDropdowns();
-document.getElementById('t-date').value=new Date().toISOString().split('T')[0];
-if (purchases.length>0) renderPortfolio();
+// INIT — driven by onAuthStateChanged above
+window.buildDropdowns = buildDropdowns;
+window.calcFees = calcFees;
+window.onCoinChange = onCoinChange;
+window.setAmt = setAmt;
+window.addPurchase = addPurchase;
+window.deletePurchase = deletePurchase;
+window.updatePrice = updatePrice;
+window.refreshAllPrices = refreshAllPrices;
+window.toggleBlock = toggleBlock;
+window.exportData = exportData;
+window.importData = importData;
+window.switchTab = switchTab;
 </script>
 </body>
 </html>
