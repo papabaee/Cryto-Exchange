@@ -181,6 +181,8 @@
   .sync-dot.synced { background:var(--accent); }
   .sync-dot.syncing { background:#ffd93d; animation:pulse 1s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .version-badge { position:fixed; bottom:12px; right:14px; font-family:var(--mono); font-size:10px; color:var(--text-dim); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:3px 10px; z-index:999; letter-spacing:0.05em; }
   footer { text-align: center; margin-top: 2rem; font-size: 11px; color: var(--text-dim); font-family: var(--mono); padding-bottom: 2rem; }
 
   @media (max-width: 520px) {
@@ -332,13 +334,8 @@
   </div>
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
-<footer>
-  <div style="margin-bottom:6px;">kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</div>
-  <div style="font-size:10px; color:var(--text-dim); font-family:var(--mono);">
-    <span style="background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.3.1</span>
-    &nbsp;·&nbsp; released 2026-05-10 &nbsp;·&nbsp; fix: duplicate coins array syntax error
-  </div>
-</footer>
+<footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
+<div class="version-badge">v1.3.2</div>
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
@@ -905,7 +902,11 @@ if (exportBtn) exportBtn.addEventListener('click', exportData);
 const importFile = document.getElementById('import-file');
 if (importFile) importFile.addEventListener('change', importData);
 
-// INIT — driven by onAuthStateChanged above
+// INIT
+buildDropdowns();
+document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
+
+// AUTH driven re-render
 </script>
 </body>
 </html>
