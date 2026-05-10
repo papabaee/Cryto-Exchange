@@ -5,15 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luno Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
-<script type="importmap">
-{
-  "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"
-  }
-}
-</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -218,7 +209,7 @@
       <input type="password" id="login-password" placeholder="••••••••"  />
     </div>
     <div class="login-error" id="login-error"></div>
-    <button class="btn-login" id="login-btn" id="login-submit-btn">Sign in</button>
+    <button class="btn-login" id="login-btn">Sign in</button>
   </div>
 </div>
 
@@ -343,10 +334,21 @@
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
 
-<script type="module">
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, deleteDoc } from "firebase/firestore";
+<!-- Firebase CDN -->
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+<script>
+// Firebase compat SDK — no imports needed
+const initializeApp = (config) => firebase.initializeApp(config);
+const getAuth = () => firebase.auth();
+const getFirestore = () => firebase.firestore();
+const signInWithEmailAndPassword = (auth, email, pass) => auth.signInWithEmailAndPassword(email, pass);
+const signOut = (auth) => auth.signOut();
+const onAuthStateChanged = (auth, cb) => auth.onAuthStateChanged(cb);
+const doc = (db, col, id) => db.collection(col).doc(id);
+const setDoc = (ref, data) => ref.set(data);
+const onSnapshot = (ref, cb, err) => ref.onSnapshot(cb, err);
 
 const firebaseConfig = {
   apiKey: "AIzaSyD9ghnQE6L3QvKJYzbjnFJmF2pPnb5xaTc",
@@ -905,7 +907,7 @@ function importData(event) {
 document.addEventListener('DOMContentLoaded', () => {});
 
 // Login
-const loginSubmitBtn = document.getElementById('login-submit-btn');
+const loginSubmitBtn = document.getElementById('login-btn');
 if (loginSubmitBtn) loginSubmitBtn.addEventListener('click', doLogin);
 
 ['login-email','login-password'].forEach(id => {
@@ -960,18 +962,6 @@ const importFile = document.getElementById('import-file');
 if (importFile) importFile.addEventListener('change', importData);
 
 // INIT — driven by onAuthStateChanged above
-window.buildDropdowns = buildDropdowns;
-window.calcFees = calcFees;
-window.onCoinChange = onCoinChange;
-window.setAmt = setAmt;
-window.addPurchase = addPurchase;
-window.deletePurchase = deletePurchase;
-window.updatePrice = updatePrice;
-window.refreshAllPrices = refreshAllPrices;
-window.toggleBlock = toggleBlock;
-window.exportData = exportData;
-window.importData = importData;
-window.switchTab = switchTab;
 </script>
 </body>
 </html>
