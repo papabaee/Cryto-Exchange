@@ -213,7 +213,7 @@
     <div class="login-error" id="login-error"></div>
     <button class="btn-login" id="login-btn">Sign in</button>
     <div style="text-align:center; margin-top:1.5rem; font-family:var(--mono); font-size:10px; color:var(--text-dim);">
-      <span style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.3.5</span>
+      <span style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.3.6</span>
     </div>
   </div>
 </div>
@@ -338,12 +338,12 @@
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
-<div class="version-badge">v1.3.5</div>
+<div class="version-badge">v1.3.6</div>
 
 <!-- Firebase CDN -->
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 // Firebase compat SDK — direct usage, no wrappers
 firebase.initializeApp({
@@ -415,8 +415,9 @@ function startSync() {
   console.log('startSync: uid =', currentUser.uid);
   const ref = db.collection('users').doc(currentUser.uid);
   unsubscribe = ref.onSnapshot(snap => {
-    console.log('onSnapshot fired, exists:', snap.exists());
-    if (snap.exists()) {
+    const snapExists = typeof snap.exists === 'function' ? snap.exists() : snap.exists;
+    console.log('onSnapshot fired, exists:', snapExists, 'type:', typeof snap.exists);
+    if (snapExists) {
       const data = snap.data();
       purchases = data.purchases || [];
       currentPrices = data.currentPrices || {};
