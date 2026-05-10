@@ -335,7 +335,7 @@
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
-<div class="version-badge">v1.3.3</div>
+<div class="version-badge">v1.3.4</div>
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
@@ -410,7 +410,7 @@ function startSync() {
   if (!currentUser) return;
   const ref = db.collection('users').doc(currentUser.uid);
   unsubscribe = ref.onSnapshot(snap => {
-    if (snap.exists) {
+    if (snap.exists()) {
       const data = snap.data();
       purchases = data.purchases || [];
       currentPrices = data.currentPrices || {};
