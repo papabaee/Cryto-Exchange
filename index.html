@@ -332,7 +332,13 @@
   </div>
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
-<footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
+<footer>
+  <div style="margin-bottom:6px;">kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</div>
+  <div style="font-size:10px; color:var(--text-dim); font-family:var(--mono);">
+    <span style="background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.3.1</span>
+    &nbsp;·&nbsp; released 2026-05-10 &nbsp;·&nbsp; fix: duplicate coins array syntax error
+  </div>
+</footer>
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
@@ -508,69 +514,7 @@ let purchases = [];
 let currentPrices = {};
 let livePrices = {};
 
-function save() { saveToFirestore(); } = [
-  { symbol:'BTC',     name:'Bitcoin',                   id:'bitcoin' },
-  { symbol:'ETH',     name:'Ethereum',                  id:'ethereum' },
-  { symbol:'XRP',     name:'XRP',                       id:'ripple' },
-  { symbol:'SOL',     name:'Solana',                    id:'solana' },
-  { symbol:'ADA',     name:'Cardano',                   id:'cardano' },
-  { symbol:'LTC',     name:'Litecoin',                  id:'litecoin' },
-  { symbol:'BCH',     name:'Bitcoin Cash',              id:'bitcoin-cash' },
-  { symbol:'DOT',     name:'Polkadot',                  id:'polkadot' },
-  { symbol:'LINK',    name:'Chainlink',                  id:'chainlink' },
-  { symbol:'AVAX',    name:'Avalanche',                  id:'avalanche-2' },
-  { symbol:'ATOM',    name:'Cosmos',                    id:'cosmos' },
-  { symbol:'XLM',     name:'Stellar',                   id:'stellar' },
-  { symbol:'UNI',     name:'Uniswap',                   id:'uniswap' },
-  { symbol:'POL',     name:'Polygon',                   id:'matic-network' },
-  { symbol:'AAVE',    name:'Aave',                      id:'aave' },
-  { symbol:'CRV',     name:'Curve',                     id:'curve-dao-token' },
-  { symbol:'SNX',     name:'Synthetix',                 id:'havven' },
-  { symbol:'ALGO',    name:'Algorand',                  id:'algorand' },
-  { symbol:'NEAR',    name:'NEAR Protocol',             id:'near' },
-  { symbol:'HBAR',    name:'Hedera',                    id:'hedera-hashgraph' },
-  { symbol:'GRT',     name:'The Graph',                 id:'the-graph' },
-  { symbol:'TON',     name:'The Open Network',          id:'the-open-network' },
-  { symbol:'TRX',     name:'Tron',                      id:'tron' },
-  { symbol:'SUI',     name:'Sui',                       id:'sui' },
-  { symbol:'INJ',     name:'Injective',                 id:'injective-protocol' },
-  { symbol:'SEI',     name:'Sei',                       id:'sei-network' },
-  { symbol:'ARB',     name:'Arbitrum',                  id:'arbitrum' },
-  { symbol:'OP',      name:'Optimism',                  id:'optimism' },
-  { symbol:'TIA',     name:'Celestia',                  id:'celestia' },
-  { symbol:'STRK',    name:'Starknet',                  id:'starknet' },
-  { symbol:'IMX',     name:'Immutable X',               id:'immutable-x' },
-  { symbol:'LRC',     name:'Loopring',                  id:'loopring' },
-  { symbol:'S',       name:'Sonic',                     id:'sonic-3' },
-  { symbol:'BERA',    name:'Berachain',                 id:'berachain-bera' },
-  { symbol:'FET',     name:'ASI Alliance',              id:'fetch-ai' },
-  { symbol:'TAO',     name:'Bittensor',                 id:'bittensor' },
-  { symbol:'RENDER',  name:'Render Network',            id:'render-token' },
-  { symbol:'VIRTUAL', name:'Virtuals Protocol',         id:'virtual-protocol' },
-  { symbol:'AXS',     name:'Axie Infinity',             id:'axie-infinity' },
-  { symbol:'SAND',    name:'The Sandbox',               id:'the-sandbox' },
-  { symbol:'APE',     name:'ApeCoin',                   id:'apecoin' },
-  { symbol:'ONDO',    name:'Ondo Finance',              id:'ondo-finance' },
-  { symbol:'PAXG',    name:'PAX Gold',                  id:'pax-gold' },
-  { symbol:'HNT',     name:'Helium',                    id:'helium' },
-  { symbol:'ANKR',    name:'Ankr',                      id:'ankr' },
-  { symbol:'ENS',     name:'Ethereum Name Service',     id:'ethereum-name-service' },
-  { symbol:'ZRO',     name:'LayerZero',                 id:'layerzero' },
-  { symbol:'LDO',     name:'Lido',                      id:'lido-dao' },
-  { symbol:'JUP',     name:'Jupiter',                   id:'jupiter-exchange-solana' },
-  { symbol:'PYTH',    name:'Pyth Network',              id:'pyth-network' },
-  { symbol:'SKY',     name:'Sky',                       id:'sky-governance-token' },
-  { symbol:'OTHER',   name:'Other (custom)',            id:null },
-];
-
-let purchases = JSON.parse(localStorage.getItem('luno_purchases') || '[]');
-let currentPrices = JSON.parse(localStorage.getItem('luno_prices') || '{}');
-let livePrices = {};
-
-function save() {
-  localStorage.setItem('luno_purchases', JSON.stringify(purchases));
-  localStorage.setItem('luno_prices', JSON.stringify(currentPrices));
-}
+function save() { saveToFirestore(); }
 
 // Build dropdowns
 function buildDropdowns() {
