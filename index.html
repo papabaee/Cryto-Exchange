@@ -335,25 +335,15 @@
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
-<div class="version-badge">v1.3.2</div>
+<div class="version-badge">v1.3.3</div>
 
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 <script>
-// Firebase compat SDK — no imports needed
-const initializeApp = (config) => firebase.initializeApp(config);
-const getAuth = () => firebase.auth();
-const getFirestore = () => firebase.firestore();
-const signInWithEmailAndPassword = (auth, email, pass) => auth.signInWithEmailAndPassword(email, pass);
-const signOut = (auth) => auth.signOut();
-const onAuthStateChanged = (auth, cb) => auth.onAuthStateChanged(cb);
-const doc = (db, col, id) => db.collection(col).doc(id);
-const setDoc = (ref, data) => ref.set(data);
-const onSnapshot = (ref, cb, err) => ref.onSnapshot(cb, err);
-
-const firebaseConfig = {
+// Firebase compat SDK — direct usage, no wrappers
+firebase.initializeApp({
   apiKey: "AIzaSyD9ghnQE6L3QvKJYzbjnFJmF2pPnb5xaTc",
   authDomain: "luno-dashboard.firebaseapp.com",
   projectId: "luno-dashboard",
@@ -361,11 +351,11 @@ const firebaseConfig = {
   messagingSenderId: "736449374620",
   appId: "1:736449374620:web:e90258bd9bafecbc890059",
   measurementId: "G-R4Z2W5JVM7"
-};
+});
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 
 let currentUser = null;
 let unsubscribe = null;
@@ -379,7 +369,7 @@ window.doLogin = async function() {
   err.textContent = '';
   btn.textContent = 'Signing in...'; btn.disabled = true;
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    await auth.signInWithEmailAndPassword(email, password);
   } catch(e) {
     err.textContent = '✗ ' + (e.code === 'auth/invalid-credential' ? 'Invalid email or password' : e.message);
     btn.textContent = 'Sign in'; btn.disabled = false;
@@ -388,10 +378,10 @@ window.doLogin = async function() {
 
 window.doLogout = async function() {
   if (unsubscribe) unsubscribe();
-  await signOut(auth);
+  await auth.signOut();
 };
 
-onAuthStateChanged(auth, user => {
+auth.onAuthStateChanged(user => {
   if (user) {
     currentUser = user;
     document.getElementById('login-screen').style.display = 'none';
@@ -418,9 +408,9 @@ function syncStatus(state) {
 
 function startSync() {
   if (!currentUser) return;
-  const ref = doc(db, 'users', currentUser.uid);
-  unsubscribe = onSnapshot(ref, snap => {
-    if (snap.exists()) {
+  const ref = db.collection('users').doc(currentUser.uid);
+  unsubscribe = ref.onSnapshot(snap => {
+    if (snap.exists) {
       const data = snap.data();
       purchases = data.purchases || [];
       currentPrices = data.currentPrices || {};
@@ -441,7 +431,7 @@ async function saveToFirestore() {
   if (!currentUser) return;
   syncStatus('syncing');
   try {
-    await setDoc(doc(db, 'users', currentUser.uid), {
+    await db.collection('users').doc(currentUser.uid).set({
       purchases,
       currentPrices,
       updatedAt: new Date().toISOString()
