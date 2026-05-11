@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://api.coingecko.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://*.gstatic.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://api.coingecko.com https://api.coingecko.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://*.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.coingecko.com https://api.coingecko.com wss://*.firebaseio.com;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Luno Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
@@ -185,11 +185,6 @@
 
   .version-badge { position:fixed; bottom:12px; right:14px; font-family:var(--mono); font-size:10px; color:var(--text-dim); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:3px 10px; z-index:999; letter-spacing:0.05em; }
 
-  .ctab { background:none; border:1px solid var(--border); border-radius:8px; padding:4px 10px; font-size:11px; font-family:var(--mono); cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
-  .ctab:hover { border-color:var(--accent); color:var(--accent); }
-  .ctab.active { background:var(--surface2); border-color:var(--accent); color:var(--accent); font-weight:500; }
-  .cleg-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-muted); cursor:pointer; user-select:none; transition:opacity 0.15s; font-family:var(--mono); }
-  .cleg-item.hidden { opacity:0.3; }
   .cleg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   footer { text-align: center; margin-top: 2rem; font-size: 11px; color: var(--text-dim); font-family: var(--mono); padding-bottom: 2rem; }
 
@@ -259,7 +254,7 @@
     <div class="login-error" id="login-error"></div>
     <button class="btn-login" id="login-btn">Sign in</button>
     <div style="text-align:center; margin-top:1.5rem; font-family:var(--mono); font-size:10px; color:var(--text-dim);">
-      <span style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.5.0</span>
+      <span style="background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 8px; letter-spacing:0.05em;">v1.4.3</span>
     </div>
   </div>
 </div>
@@ -368,26 +363,8 @@
       <div class="empty-state">No purchases yet.<br>Add your first purchase above ↑</div>
     </div>
 
-  <!-- PERFORMANCE CHART -->
-  <div class="card" id="chart-card" style="display:none; margin-top:1rem;">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-      <div class="card-label" style="margin-bottom:0;">// portfolio performance</div>
-      <div style="display:flex; gap:4px;" id="chart-tabs">
-        <button class="ctab" data-r="1H">1H</button>
-        <button class="ctab" data-r="1D">1D</button>
-        <button class="ctab" data-r="1M">1M</button>
-        <button class="ctab active" data-r="1Y">1Y</button>
-        <button class="ctab" data-r="ALL">All</button>
-      </div>
-    </div>
-    <div id="chart-legend" style="display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap;"></div>
-    <div style="position:relative; width:100%; height:300px;">
-      <canvas id="portfolioChart" role="img" aria-label="Line chart showing portfolio value over time per coin"></canvas>
-      <div id="chart-tooltip" style="display:none; position:absolute; pointer-events:none; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; min-width:180px; z-index:10; font-family:var(--mono);"></div>
-    </div>
-    <div id="deposit-log-section" style="margin-top:16px;"></div>
   </div>
-  </div>
+</div>
 </div>
 <div class="card" id="data-card" style="margin-top:1.5rem;">
   <div class="card-label">// data management</div>
@@ -404,7 +381,7 @@
   <div style="font-size:11px;color:var(--text-dim);font-family:var(--mono);margin-top:10px;">export saves all purchases · import restores on any device or browser</div>
 </div>
 <footer>kept local, never uploaded · live rates by CoinGecko · not financial advice · built for papabear 🐻</footer>
-<div class="version-badge">v1.5.0</div>
+<div class="version-badge">v1.4.3</div>
 
 
 <!-- EDIT MODAL -->
@@ -442,8 +419,6 @@
   </div>
 </div>
 
-<!-- Chart.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <!-- Firebase CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -630,7 +605,7 @@ function switchTab(tab) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
   document.getElementById('page-' + tab).classList.add('active');
-  if (tab === 'tracker') { renderPortfolio(); showChartCard(); }
+  if (tab === 'tracker') renderPortfolio();
 }
 
 function fmt(n, d=2) { return 'RM ' + parseFloat(n).toLocaleString('en-MY', {minimumFractionDigits:d,maximumFractionDigits:d}); }
@@ -975,301 +950,6 @@ function importData(event) {
 
 
 
-// ─── PORTFOLIO CHART ─────────────────────────────────────────────────────────
-const CHART_COINS = [
-  { key:'BTC', name:'Bitcoin',  id:'bitcoin',  color:'#F7931A', dash:[] },
-  { key:'ETH', name:'Ethereum', id:'ethereum', color:'#627EEA', dash:[6,3] },
-  { key:'SOL', name:'Solana',   id:'solana',   color:'#9945FF', dash:[3,3] },
-  { key:'ADA', name:'Cardano',  id:'cardano',  color:'#0033AD', dash:[8,4,2,4] },
-];
-const COIN_COLOR = { BTC:'#F7931A', ETH:'#627EEA', SOL:'#9945FF', ADA:'#0033AD' };
-
-let portfolioChart = null;
-let chartHidden = {};
-let chartRange = '1Y';
-let chartPriceCache = {};
-
-function showChartCard() {
-  const card = document.getElementById('chart-card');
-  if (purchases.length > 0) {
-    card.style.display = 'block';
-    renderChart(chartRange);
-  } else {
-    card.style.display = 'none';
-  }
-}
-
-async function fetchChartPrices(coinId, days) {
-  const key = coinId + '_' + days;
-  if (chartPriceCache[key]) return chartPriceCache[key];
-  try {
-    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=myr&days=${days}&interval=${days<=1?'hourly':'daily'}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
-    chartPriceCache[key] = data.prices; // [[timestamp, price], ...]
-    return data.prices;
-  } catch(e) {
-    return null;
-  }
-}
-
-function getEarliestPurchaseDate() {
-  if (!purchases.length) return null;
-  return purchases.reduce((earliest, p) => p.date < earliest ? p.date : earliest, purchases[0].date);
-}
-
-function getCoinsInPortfolio() {
-  return [...new Set(purchases.map(p => p.coin))];
-}
-
-async function renderChart(range) {
-  chartRange = range;
-  document.querySelectorAll('.ctab').forEach(t => t.classList.toggle('active', t.dataset.r === range));
-
-  const portfolioCoins = getCoinsInPortfolio();
-  const chartCoins = CHART_COINS.filter(c => portfolioCoins.includes(c.key));
-  if (!chartCoins.length) return;
-
-  // Show loading state
-  const canvas = document.getElementById('portfolioChart');
-  if (!canvas) return;
-
-  // Determine days param for CoinGecko
-  let days;
-  if (range === '1H') days = 1;
-  else if (range === '1D') days = 1;
-  else if (range === '1M') days = 30;
-  else if (range === '1Y') days = 365;
-  else { // ALL — from first purchase
-    const earliest = getEarliestPurchaseDate();
-    if (earliest) {
-      const diffMs = Date.now() - new Date(earliest).getTime();
-      days = Math.max(1, Math.ceil(diffMs / 86400000));
-    } else days = 30;
-  }
-
-  // Fetch prices for all portfolio coins
-  const priceData = {};
-  await Promise.all(chartCoins.map(async c => {
-    const prices = await fetchChartPrices(c.id, days);
-    priceData[c.key] = prices;
-  }));
-
-  // Build unified timeline from first coin's timestamps
-  const firstKey = chartCoins[0].key;
-  const rawPrices = priceData[firstKey];
-  if (!rawPrices) return;
-
-  // Filter timestamps for range
-  const now = Date.now();
-  let cutoff = 0;
-  if (range === '1H') cutoff = now - 3600000;
-  else if (range === '1D') cutoff = now - 86400000;
-  else if (range === '1M') cutoff = now - 30*86400000;
-  else if (range === '1Y') cutoff = now - 365*86400000;
-  else {
-    const earliest = getEarliestPurchaseDate();
-    cutoff = earliest ? new Date(earliest).getTime() - 86400000 : 0;
-  }
-
-  const filteredTimestamps = rawPrices
-    .filter(([ts]) => ts >= cutoff)
-    .map(([ts]) => ts);
-
-  if (!filteredTimestamps.length) return;
-
-  // Format labels
-  const labels = filteredTimestamps.map(ts => {
-    const d = new Date(ts);
-    if (range === '1H' || range === '1D') return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-    if (range === '1M') return (d.getMonth()+1) + '/' + d.getDate();
-    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()] + ' ' + d.getFullYear().toString().slice(2);
-  });
-
-  // Build datasets — show portfolio VALUE (coins held * price)
-  const datasets = chartCoins.map(c => {
-    const prices = priceData[c.key];
-    if (!prices) return null;
-
-    // Get how many coins held at each timestamp
-    const coinPurchases = purchases.filter(p => p.coin === c.key).sort((a,b) => a.date.localeCompare(b.date));
-    const totalCoins = coinPurchases.reduce((sum, p) => sum + p.coinsReceived, 0);
-
-    const priceMap = {};
-    prices.forEach(([ts, price]) => { priceMap[ts] = price; });
-
-    const data = filteredTimestamps.map(ts => {
-      // find closest price
-      const closest = prices.reduce((prev, [t, p]) => Math.abs(t-ts) < Math.abs(prev[0]-ts) ? [t,p] : prev, prices[0]);
-      const price = closest[1];
-      // only show value from first purchase of this coin
-      const firstPurchase = coinPurchases[0];
-      if (!firstPurchase) return null;
-      const firstDate = new Date(firstPurchase.date).getTime();
-      if (ts < firstDate - 86400000) return null;
-      return parseFloat((totalCoins * price).toFixed(2));
-    });
-
-    return {
-      label: c.key,
-      data,
-      borderColor: c.color,
-      borderDash: c.dash,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 0,
-      tension: 0.4,
-      fill: false,
-      spanGaps: false,
-      hidden: !!chartHidden[c.key],
-    };
-  }).filter(Boolean);
-
-  // Deposit markers for annotation
-  const depositMarkers = purchases.map((p, i) => {
-    const firstOfCoin = purchases.filter(px => px.coin === p.coin).sort((a,b)=>a.date.localeCompare(b.date))[0];
-    const pts = new Date(p.date).getTime();
-    if (pts < cutoff) return null;
-    const idx = filteredTimestamps.findIndex(ts => {
-      const d = new Date(p.date);
-      const tsd = new Date(ts);
-      return tsd.toDateString() === d.toDateString();
-    });
-    return { idx: idx === -1 ? null : idx, coin: p.coin, color: COIN_COLOR[p.coin] || '#888', label: '#'+(i+1), spent: p.spent, price: p.price, coinsReceived: p.coinsReceived, date: p.date };
-  }).filter(d => d && d.idx !== null);
-
-  // Build legend
-  const legend = document.getElementById('chart-legend');
-  legend.innerHTML = '';
-  chartCoins.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'cleg-item' + (chartHidden[c.key] ? ' hidden' : '');
-    div.id = 'cleg-' + c.key;
-    div.innerHTML = `<span class="cleg-dot" style="background:${c.color}"></span><span>${c.key}</span>`;
-    div.onclick = () => {
-      chartHidden[c.key] = !chartHidden[c.key];
-      div.classList.toggle('hidden');
-      const ds = portfolioChart?.data.datasets.find(d=>d.label===c.key);
-      if (ds) { ds.hidden = !!chartHidden[c.key]; portfolioChart.update('none'); }
-    };
-    legend.appendChild(div);
-  });
-
-  // Deposit log
-  const depLog = document.getElementById('deposit-log-section');
-  depLog.innerHTML = '<div style="font-size:10px;color:var(--text-muted);font-family:var(--mono);margin-bottom:8px;letter-spacing:0.1em;text-transform:uppercase;">Deposit history</div>';
-  [...purchases].sort((a,b)=>a.date.localeCompare(b.date)).forEach((p,i)=>{
-    const color = COIN_COLOR[p.coin] || '#888';
-    depLog.innerHTML += `<div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--surface2);border-radius:10px;font-size:11px;font-family:var(--mono);margin-bottom:6px;flex-wrap:wrap;">
-      <span style="width:18px;height:18px;border-radius:50%;background:${color}22;color:${color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0">#${i+1}</span>
-      <span style="color:var(--text-muted)">${p.date}</span>
-      <span style="font-weight:500;color:var(--text)">${p.coin}</span>
-      <span style="color:var(--text-muted)">RM ${p.spent.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-      <span style="color:var(--text-muted)">${p.coinsReceived.toFixed(4)} coins @ RM ${p.price.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-      <span style="margin-left:auto;font-size:10px;background:${color}22;color:${color};padding:2px 8px;border-radius:4px;">Deposit #${i+1}</span>
-    </div>`;
-  });
-
-  // Crosshair + deposit marker plugin
-  const crosshairPlugin = {
-    id: 'crosshairDep',
-    afterDraw(chart) {
-      if (chart._cx == null) return;
-      const {ctx, chartArea:{top,bottom}} = chart;
-      ctx.save();
-      ctx.beginPath(); ctx.moveTo(chart._cx,top); ctx.lineTo(chart._cx,bottom);
-      ctx.strokeStyle='rgba(128,128,128,0.35)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.stroke();
-      ctx.restore();
-    },
-    afterDatasetsDraw(chart) {
-      const {ctx} = chart;
-      depositMarkers.forEach(dep => {
-        if (dep.idx == null) return;
-        const meta = chart.getDatasetMeta(0);
-        const pt = meta.data[dep.idx];
-        if (!pt) return;
-        const x = pt.x, top = chart.chartArea.top;
-        ctx.save();
-        ctx.beginPath(); ctx.moveTo(x, top+10); ctx.lineTo(x, chart.chartArea.bottom);
-        ctx.strokeStyle = dep.color+'44'; ctx.lineWidth=1; ctx.setLineDash([3,3]); ctx.stroke();
-        ctx.beginPath(); ctx.arc(x, top+10, 6, 0, Math.PI*2);
-        ctx.fillStyle = dep.color; ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.font = 'bold 7px var(--mono, monospace)';
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        ctx.fillText(dep.label, x, top+10);
-        ctx.restore();
-      });
-    }
-  };
-
-  // Destroy old chart
-  if (portfolioChart) { portfolioChart.destroy(); portfolioChart = null; }
-
-  // Register plugin fresh each time
-  Chart.register(crosshairPlugin);
-
-  portfolioChart = new Chart(canvas, {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode:'index', intersect:false },
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false,
-          external(ctx2) {
-            const tt = document.getElementById('chart-tooltip');
-            const ch = ctx2.chart;
-            if (ctx2.tooltip.opacity === 0) { tt.style.display='none'; ch._cx=null; ch.draw(); return; }
-            ch._cx = ctx2.tooltip.caretX; ch.draw();
-            const idx = ctx2.tooltip.dataPoints[0]?.dataIndex;
-            const lbl = ctx2.tooltip.dataPoints[0]?.label || '';
-            const deps = depositMarkers.filter(d => d.idx === idx);
-            let html = `<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">${lbl}</div>`;
-            ctx2.tooltip.dataPoints.forEach(dp => {
-              if (dp.raw == null || chartHidden[dp.dataset.label]) return;
-              const color = COIN_COLOR[dp.dataset.label] || '#888';
-              const coinPurch = purchases.filter(p=>p.coin===dp.dataset.label);
-              const totalSpent = coinPurch.reduce((s,p)=>s+p.spent,0);
-              const pnl = dp.raw - totalSpent;
-              const pnlSign = pnl >= 0 ? '+' : '';
-              const pnlColor = pnl >= 0 ? 'var(--accent)' : 'var(--red)';
-              html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
-                <span style="font-size:11px;font-weight:500;color:var(--text);flex:1">${dp.dataset.label}</span>
-                <span style="font-size:11px;color:var(--text)">RM ${dp.raw.toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-                <span style="font-size:10px;color:${pnlColor}">${pnlSign}${((pnl/totalSpent)*100).toFixed(1)}%</span>
-              </div>`;
-            });
-            if (deps.length) {
-              deps.forEach(d => {
-                html += `<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
-                  <div style="display:flex;align-items:center;gap:6px;font-size:10px;">
-                    <span style="width:5px;height:5px;border-radius:50%;background:${d.color};display:inline-block;flex-shrink:0"></span>
-                    <span style="font-weight:500;color:var(--text)">Deposit ${d.label} · ${d.coin}</span>
-                  </div>
-                  <div style="font-size:10px;color:var(--text-muted);margin-top:2px;padding-left:11px">RM ${d.spent.toLocaleString()} · ${d.coinsReceived.toFixed(4)} coins</div>
-                </div>`;
-              });
-            }
-            tt.innerHTML = html;
-            const tooltipW = 200;
-            let left = ctx2.tooltip.caretX + 14;
-            if (left + tooltipW > ch.chartArea.right) left = ctx2.tooltip.caretX - tooltipW - 14;
-            tt.style.left = left + 'px'; tt.style.top = (ch.chartArea.top + 8) + 'px'; tt.style.display = 'block';
-          }
-        }
-      },
-      scales: {
-        x: { grid:{color:'rgba(128,128,128,0.08)',drawBorder:false}, ticks:{color:'rgba(128,128,128,0.5)',font:{size:10},maxTicksLimit:8,maxRotation:0}, border:{display:false} },
-        y: { grid:{color:'rgba(128,128,128,0.08)',drawBorder:false}, ticks:{color:'rgba(128,128,128,0.5)',font:{size:10}, callback: v => v>=1000?'RM '+(v/1000).toFixed(0)+'k':'RM '+v.toFixed(2)}, border:{display:false} }
-      }
-    }
-  });
-}
-
 // ─── EDIT TRANSACTION ────────────────────────────────────────────────────────
 function openEdit(id) {
   const p = purchases.find(p => p.id === id);
@@ -1367,11 +1047,6 @@ const refreshBtn = document.getElementById('refresh-btn');
 if (refreshBtn) refreshBtn.addEventListener('click', refreshAllPrices);
 
 // Export
-// Chart tabs
-document.querySelectorAll('.ctab').forEach(tab => {
-  tab.addEventListener('click', () => renderChart(tab.dataset.r));
-});
-
 // Edit modal
 const modalCloseBtn = document.getElementById('modal-close-btn');
 const modalCancelBtn = document.getElementById('modal-cancel-btn');
